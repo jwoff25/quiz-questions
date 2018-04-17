@@ -23,26 +23,31 @@ time.sleep(1)
 browser.find_element_by_css_selector("input").submit()
 time.sleep(5)
 
-# START QUIZ
-browser.find_element_by_id("take_quiz_link").click()
-time.sleep(5)
-browser.find_element_by_id("submit_quiz_button").click()
-alert = browser.switch_to.alert
-alert.accept()
-time.sleep(5)
+for x in range(60):
+    # START QUIZ
+    print "--- TAKING QUIZ ---"
+    browser.find_element_by_id("take_quiz_link").click()
+    time.sleep(1)
+    browser.find_element_by_id("submit_quiz_button").click()
+    alert = browser.switch_to.alert
+    alert.accept()
+    time.sleep(5)
 
-# PARSE QUIZ 
-html = browser.page_source
-soup = bs4.BeautifulSoup(html, "html.parser")
-for div in soup.findAll("div", {"class": "question_text user_content enhanced"}):
-    if div.find('p').text not in questions: 
-        questions.append(div.find('p').text)
-for div in soup.findAll("div", {"class": "answer answer_for_ correct_answer"}):
-    if div.get("title") not in answers:
-        answers.append(div.get("title"))
+    # PARSE QUIZ 
+    print "--- PARSING ANSWERS ---"
+    html = browser.page_source
+    soup = bs4.BeautifulSoup(html, "html.parser")
+    for div in soup.findAll("div", {"class": "question_text user_content enhanced"}):
+        if div.find('p').text not in questions: 
+            questions.append(div.find('p').text)
+    for div in soup.findAll("div", {"class": "answer answer_for_ correct_answer"}):
+        if div.get("title") not in answers:
+            answers.append(div.get("title"))
+    time.sleep(2)
+    #print questions
+    #print answers
+    print "--- STARTING OVER ---"
 
-print questions
-print answers
 #print soup.prettify()
 with open("data.csv", 'w') as f:
     for i in range(len(questions)):
