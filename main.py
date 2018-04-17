@@ -4,6 +4,10 @@ import time
 import keys
 import bs4
 
+# initialize my variables
+questions = []
+answers = []
+
 # LOG IN TO CANVAS, ACCESS QUIZ PAGE
 browser = webdriver.Firefox()
 #browser.get("https://byuh.instructure.com/login/ldap")
@@ -17,7 +21,25 @@ password.send_keys(keys.PASSWORD)
 time.sleep(1)
 #browser.find_element_by_class_name("Button Button--login").submit()
 browser.find_element_by_css_selector("input").submit()
+time.sleep(5)
 
 # START QUIZ
-#browser.find_element_by_id("take_quiz_link").click()
-soup = bs4.BeautifulSoup()
+browser.find_element_by_id("take_quiz_link").click()
+time.sleep(5)
+browser.find_element_by_id("submit_quiz_button").click()
+alert = browser.switch_to.alert
+alert.accept()
+time.sleep(5)
+
+# PARSE QUIZ 
+html = browser.page_source
+soup = bs4.BeautifulSoup(html, "html.parser")
+for div in soup.findAll("div", {"class": "question_text user_content enhanced"}):
+    questions.append(div.find('p').text)
+for div in soup.findAll("div", {"class": "answer answer_for_ correct_answer"}):
+    answers.append(div.get("title"))
+#print soup.prettify()
+with open("data.csv", 'w') as f:
+    for i in range(len(questions)):
+        f.write((questions[i] + "," + answers[i].split(". ")[0]).strip().encode('utf-8'))
+#browser.close()
