@@ -35,11 +35,17 @@ time.sleep(5)
 html = browser.page_source
 soup = bs4.BeautifulSoup(html, "html.parser")
 for div in soup.findAll("div", {"class": "question_text user_content enhanced"}):
-    questions.append(div.find('p').text)
+    if div.find('p').text not in questions: 
+        questions.append(div.find('p').text)
 for div in soup.findAll("div", {"class": "answer answer_for_ correct_answer"}):
-    answers.append(div.get("title"))
+    if div.get("title") not in answers:
+        answers.append(div.get("title"))
+
+print questions
+print answers
 #print soup.prettify()
 with open("data.csv", 'w') as f:
     for i in range(len(questions)):
         f.write((questions[i] + "," + answers[i].split(". ")[0]).strip().encode('utf-8'))
+        f.write("\n")
 #browser.close()
